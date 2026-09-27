@@ -158,4 +158,39 @@
       }, 1400);
     });
   });
+
+  const stories = document.querySelectorAll(".story-card");
+  if (stories.length && "HTMLDialogElement" in window) {
+    const lightbox = document.createElement("dialog");
+    lightbox.className = "lightbox";
+    lightbox.innerHTML = '<button type="button" aria-label="Close image">×</button><img alt="" /><p></p>';
+    document.body.appendChild(lightbox);
+    const lightboxImage = lightbox.querySelector("img");
+    const lightboxCaption = lightbox.querySelector("p");
+
+    stories.forEach((story) => {
+      story.tabIndex = 0;
+      story.setAttribute("role", "button");
+      story.setAttribute("aria-label", `Open ${story.querySelector("figcaption span")?.firstChild?.textContent || "story"}`);
+      const openStory = () => {
+        const image = story.querySelector("img");
+        lightboxImage.src = image.src;
+        lightboxImage.alt = image.alt;
+        lightboxCaption.textContent = story.querySelector("figcaption span")?.firstChild?.textContent || image.alt;
+        lightbox.showModal();
+      };
+      story.addEventListener("click", openStory);
+      story.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          openStory();
+        }
+      });
+    });
+
+    lightbox.querySelector("button").addEventListener("click", () => lightbox.close());
+    lightbox.addEventListener("click", (event) => {
+      if (event.target === lightbox) lightbox.close();
+    });
+  }
 })();
